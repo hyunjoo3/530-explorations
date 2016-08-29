@@ -1,176 +1,65 @@
----
-title: 'Exploration 1: Description in One Dimension'
-author: 'Jake Bowers'
-date: '`r format(Sys.Date(), "%B %d, %Y")`'
-bibliography: classbib.bib
-fontsize: 10pt
-geometry: margin=1in
-mainfont: "Minion Pro"
-graphics: yes
-output:
-  html_document:
-    fig_caption: yes
-    fig_height: 4
-    fig_width: 4
-  pdf_document:
-    latex_engine: xelatex
-    graphics: yes
-    fig_caption: yes
-    fig_height: 4
-    fig_width: 4
----
 
-<!-- Make this document using library(rmarkdown); render("exploration1.Rmd") -->
-\input{mytexsymbols}
-
-
-
-```{r include=FALSE, cache=FALSE}
-# Some customization.  You can alter or delete as desired (if you know what you are doing).
-# knitr settings to control how R chunks work.
-
-## To make the html file do
-## render("exploration1.Rmd",output_format=html_document(fig_retina=FALSE))
-## To make the pdf file do
-## render("exploration1.Rmd",output_format=pdf_document())
-
-require(knitr)
-opts_chunk$set(
-  tidy=FALSE,     # display code as typed
-  size="small",    # slightly smaller font for code
-  echo=TRUE,
-  results='markup',
-  strip.white=TRUE,
-  fig.path='figs/fig',
-  cache=FALSE,
-  highlight=TRUE,
-  width.cutoff=132,
-  size='footnotesize',
-  out.width='.9\\textwidth',
-  fig.retina=FALSE,
-  message=FALSE,
-  comment=NA)
-```
-
-
-```{r initialize,echo=FALSE}
-##First, just setup the R environment for today:
-if(!file.exists('figs')) dir.create('figs')
-
-options(SweaveHooks=list(fig=function(){
-			   par(mar=c(3.5, 3, 1.1, 0),
-			       pty="s",
-			       mgp=c(1.5,0.5,0),
-			       oma=c(0,0,0,0))},
-			 echo=function(){options(continue=" ") ##Don't show "+" prompts,
-			 options(prompt=" ")
-			 }),
-	digits=4,
-	scipen=8,
-	width=132
-	)
-options(error=function(){options(prompt="> ",continue="+ ");NULL})
-```
-
-"Brexit! UKIP! ISIL!" When your old friend calls, she seems to be yelling. Once
-she calms down, she explains: "I am in charge of Improving Civic Society
-programs for the United Nations, and have been asked to step in to help out at
-the UK Office of Social Capital." After you congratulate her on what appears to
-be a promotion she continues. "The thing is that over here in the UK, they are
-really big on numbers. I asked my staff for a simple report on the status of
-civic society in the UK before all of the recent unrest happened there, say, in
-2005, before the London Bombings. They responded with numbers. When I asked
-them to explain, I found their desks empty, their chairs knocked over, and
-their computers smashed, but their coffee cups still warm and untouched." You
-ask her about her own safety and she responds. "This is all within operational
-parameters. No worries. My problem is that I need to report to the high command
-and I don't know what the right answer is. Now I don't even have numbers. Please help. Can we hop on a
-Hangout?"
-
-She does not enable video in the Hangout. However, she begins sending you some
-code. "Here is what I have in terms of output. Can you explain to me what is
-going on?"
-
-
+# My fried received a simple report on the status of civic society in the UK before the London Bombings. The report consists of numbers that my friend does not understand and she needs to report to the high command. First I would like to help her review the data by loadig it.
 ```{r}
-load(url("http://jakebowers.org/Data/ho05.rda"))
-table(ho05$postbomb,useNA="ifany")
-library(dplyr)
-wrkdat <- ho05  %>% filter(postbomb==0)
-sum(wrkdat$hlphrs)
+load(url("http://jakebowers.org/Data/ho05.rda")) # import a dataset
+# Since she is interested in the data before the London Bombing, I would look at the column of "postbomb". As given from the codebook, variables that have the code "0" fall under our observation. 
+table(ho05$postbomb,useNA="ifany") # creating a frequency table for the variable postbomb, useNA="ifany" includes in the table the counts of NA values if there is any missing values  
+# Since 800 variables are mixed with other 200 variables, I would like to create another data sheet that consists of variables with code "0". 
+library(dplyr) # loading package that provides data manipulating functions 
+wrkdat <- ho05  %>% filter(postbomb==0) # creating data wrkdat, filter results to include the value of postbomb that equals to 0
+# Looking at the codebook, I could understand what the column "hlphrs" signifies. Apparently, the program interviewd people on how many hours they spent helping some groups, clubs, or organizations and how many hours they spent helping other people as an individual. The variable "hlphrs" is the sum of group hours and individual hours.
+sum(wrkdat$hlphrs, na.rm=T) # sum all the values of the variable hlphrs, which gives the result of NA due to  missing values. In order to count the sum, we can add the function na.rm=T.  
 ```
 
-She continues, "And then I have this from a previous meeting where they talked about `codebooks` but I don't think these were the ordinary kind of encrypted communication behind enemy lines."
 
-\begin{small}
-\begin{verbatim}
-  ### CODEBOOK
-  postbomb: 1=interviewed after the bombing, 0=interviewed before the bombing
-
-  grphrs: 6.1.1 Which of the following groups, clubs or organisations
-    have you been involved with during the last 12 months? That's anything
-    you've taken part in, supported, or that you've helped in any way, either
-    on your own or with others. Please exclude giving money and anything that
-    was a requirement of your job.
-
-    6.1.2 In the last 12 months have you given unpaid help to any groups, clubs or
-    organisations in any of the following ways?
-
-    6.1.5 Approximately how many hours have you spent helping this/these group(s),
-    club(s) or organisation(s) in the past 4 weeks?
-
-  infhrs: In the last 12 months have you done any of the following things,
-    unpaid, for someone who was not a relative?
-
-    This is any unpaid help you, as an individual, may have given to other people,
-    that is apart from any help given through a group, club or organisation. This
-    could be help for a friend, neighbour or someone else but not a relative.
-
-    6.4.4 Now just thinking about the past 4 weeks. Approximately how many hours
-    have you spent doing this kind of thing/these kind of things in the past 4
-    weeks?
-
-  hlphrs: grphrs+infhrs
 \end{verbatim}
 \end{small}
 
-She asks, "What is the best way to say how civic life was going before the bombings? What is the right answer?"
+#Referring to the question that my friend asked, "What is the best way to say how civic life was going before the bombings? What is the right answer?", I would suggest that the variable "hlphrs" is very informative in terms of how people engaged in civic life. However, presenting all the values of the column is not the best way. I would not suggest describing the variable in one dimension, which is giving one value that represents the whole data.
+## The best way to describe the civic life by using the given variable, help hours, would be to find the proper representation. There are several ways to describe the variable, for example, minimum and maximum, median, and the mean. Obviously, there are various ways to calculate the mean. There is no right answer, but it differs according to how we want to treat the outliers.
 
-Later, after you had worked on this a bit she calls back, "Hey. Thanks so much
-for helping! I just found this code and thought it might be useful. What do you
-think? Can you tell me what this means? Does it help me get the right answer
-about how much time people in the UK were devoting to helping each other and/or
-supporting groups? Why are there so many ways to descibe a single variable
-anyway? What is the point?  Also, are there any plots that would help me tell
-the right story about this variable?"
+
+# The codes help us to know the average time that people spend to help others. By controlling outliers we can obtain different means to describe a single variable. Depending on the purpose of research, the importance of outliers and how we control them varies. By calculating different kinds of means we can better analyze and interpret data. 
+
+# histogram could help to visualize the given data, code: hist(wrkdat$hlphrs)
 
 ```{r, results='hide'}
-mean(wrkdat$hlphrs,trim=.1,na.rm=TRUE)
+# When we cacaluate the mean it is 6.633626, which might not be representing the data as it could be influenced by outliers. Therefore, we use other methods such as the trimmed mean and winsorized mean.
+mean(wrkdat$hlphrs,trim=.1,na.rm=TRUE) #mean of the variable hlphrs after removing the lowest and highest 5% values, na.rm=T omits all NA from the calculation. There is a difference between the trimmed mean (3.327074) and the mean (6.633626). 
 hlp <- unlist(wrkdat %>% dplyr::select(hlphrs) %>% filter(!is.na(hlphrs)))
-library(psych)
-winsor.mean(hlp)
-library(robustHD)
-mean(winsorize(hlp))
+# create values of hlp
+# from wrkdat data select hlphrs and show all non-missing values in the data
+# The following is the procedures of obtaining two different kinds of means that adjust the affect of outliers.
+library(psych) #loading package psych
+winsor.mean(hlp) #calulating mean after replacing extreme values. The result is 3.134253.
+library(robustHD) # loading package robustHD
+mean(winsorize(hlp)) # winsorize (replacing the extreme values) of hlp and calulating the mean. The result is 1.802459
 
+# The following is the functions to obtain the one step Huber M estimator. Rather than symmetrically trimming the predetermined amount of the data, we can adjust the amount of trimming based on the distribution of outliers by using this method.
 onestepMest <- function(x){
 	## Following http://www.psychology.mcmaster.ca/bennett/boot09/rt2.pdf
-	madn <- mad(x, constant = 1.4826) ## 1/1.4826 = .6745
-	M <-  ( abs(x - median(x)) / madn )  > 1.28
-	U <- sum( x > M)
-	L <- sum( x < M)
-	B <- length(x) - U - L
-	n <- length(x)
-	mux <- (1.28 * madn * (U-L) + B) /(n - L - U)
-	return(mux)
+	madn <- mad(x, constant = 1.4826) ## 1/1.4826 = .6745   
+  #mad calculates the median absolute deviations from the median of a dataset. It is a robust measure of the variability in a sample
+	#The result is stored as madn. 	
+	M <-  ( abs(x - median(x)) / madn )  > 1.28 
+	#abs computes the absolute value of (x-median(x)). The result is divided by madn. 
+  U <- sum( x > M) #summing values that are greater than M. The result is named U
+	L <- sum( x < M) # summing values that are less than M.The result is named L
+	B <- length(x) - U - L  
+	n <- length(x) 
+	mux <- (1.28 * madn * (U-L) + B) /(n - L - U) 
+	return(mux) # return the value of mux 
 }
 
-onestepMest(hlp)
-library(robustbase)
-huberM(hlp)
-fivenum(hlp)
-quantile(hlp,seq(0,1,.1))
+onestepMest(hlp) #insert hlp to function named 'onestepMest' 
+library(robustbase) #loading package
+huberM(hlp) #driving huberM estimator  
+fivenum(hlp) #returns the summary of five functions (minimum, lower-hinge, median, upper-hinge, maximum)
+quantile(hlp,seq(0,1,.1))#quantile of hlp, with a sequence of 10% interval 
 
 ```
+
+# There are various ways to gain information of a data by calcuating different means. There are different methods to control outliers that could distort the interpretation of data. The trimmed mean and mean obtained by the function onestepMest compute similar estimates of mean. By comparing the different outcomes we can better understand the data.
 
 <!-- see also https://dornsife.usc.edu/labs/rwilcox/software/ and WRS:::mest  https://dornsife.usc.edu/assets/sites/239/docs/WRS2.pdf and the MASS library--->
 
