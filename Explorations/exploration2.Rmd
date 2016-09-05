@@ -1,0 +1,155 @@
+---
+title: "Cho, Kim, Jung"
+author: "Hyun Joo CHO"
+date: "2016?? 9?? 5??"
+output: html_document
+---
+---
+title: "Exploration2"
+author: "Hyun Joo CHO"
+date: "2016??? 9??? 4???"
+output: html_document
+---
+
+Loading data
+```{r}
+library(readstata13)
+bes<-read.dta13("http://jakebowers.org/Data/BES2015/bes_f2f_original_v3.0.dta",convert.factors=FALSE)
+```
+
+
+My friend needs to find out whether there is an evidence for the following statements: "Support for anti-immigration populists like Trump or the UKIP party arises from anti-feminism more than nativism." and "In countries like the UK, education and income are not strongly related." She found an appropriate survey that is representative of people in the UK. The data is titled British Election Study 2015, which is a post-election, face-to-face survey. She also found a codebook that shows series of questionnaires and choices presented to the respondents.
+
+First, I will look at the variables related to two statements, which are ideological spectrum(e01), anti-feminism(r03), nativism(j01), education, and income(y01). The reason I selected such variables is because party support for anti-immigration populists can be better understood if viewed in the wider spectrum of political ideological spectrum. Variables that have many variations show the relationship between two variables better than ones with just two variations, for example, the variable of e01 gives us more variations than ??ukipvoter?? variable. Looking at the variables, there are some codes in negative values that signifies "Don't know" responses. In order to view a relation between two variales, I can either place the "Don't know" value at some place within the spectrum or remove them from the data set. Therefore, I will remove the negative values from the variables r03, e01, j01. 
+
+After doing so, I will compare the relation between anti-feminism and party support, and nativism and party support. In order to compare the two relationships, I suggest three ways to describe them; table of proportions, correlation coefficient, and regression. First, table of proportions is a table where you can see the proportion that the each pair of x and y value. Proportion of each pair would give us the general tendency of the relationship. Second, correlation coefficient is the strength of a relation between two variables. Third, regression is an analysis of relationship between dependent variable and independent variable, how much a unit change in independent variable increases/decreases the dependent variable. The difference between correlation efficient and regression is that the latter assumes the direction that independent variable has an influence on the dependent variable, whereas correlation does not make such assumption. Regression gives us more precise information on the strength of the relationship between X and Y. 
+
+Next, I will conduct the above three ways to describe relationship between  anti-feminism and party support. First, the proportion table of the two variables shows proportion of each pair.  For example, people who feel that the attempts to ensure equality for women have gone much too far are situated more at the very right end of the political spectrum (prop: 0.008) than at the very left end (prop: 0.004). Second, the correlation between the two variables is -0.1518309. It means that there is a negative relation. Third, as a result of the regression, I got a linear regression function of y= -0.34x + 6.14733 and a p-value of 4.281e-14. From the plot, we can see that distribution of the values are dense near the regression line. P-value shows that there is a significant correlation between the two variables. The slope of the function means that the relation is negative, the more anti-feminist the person is, the more he/she is at the right end of the political ideological scale.
+
+1. Relationship between Feminism(r03) and Partisanship(e01)
+```{r}
+# For variable r03 (feminism), replacing the negative values of -1(don't know) to NA
+feminism <- replace(x<-bes$r03,x==-1,NA)
+# For variable e01 (partisonship), replacing the negative values of -1(don't know) and -2(refused) to NA
+partisan <- replace(y<-bes$e01,y==-1,NA)
+partisan1 <- replace(z<-partisan, z==-2,NA)
+```
+
+
+
+Describing bivariate relationship (Table of Proportions, Correlation, Linear regression)
+
+a. Table of Proportions
+```{r, echo=T}
+# This two-way table displays the proportion of people falling into each category. This table can help us to know the relationship between two variables. 
+tbl3<-table(partisan1,feminism)
+prop.table(tbl3)
+```
+
+b. Correlation
+```{r}
+cor(feminism, partisan1, use="complete") 
+```
+
+c. Regression
+
+Partisanship = a + b(Feminism) 
+```{r}
+tbl<-table(feminism,partisan1)
+fit <- lm(partisan1~feminism)
+summary(fit)
+```
+
+
+```{r}
+plot(jitter(feminism), jitter(partisan1))
+abline(lm(partisan1~feminism))
+```
+
+
+Similarly, I will conduct the three ways to describe relationship between nativism and party support. First, people who feel that the immigration is bad for Britain's economy are situated more at the very right end of the political spectrum (prop: 0.007) than at the very left end (prop: 0.006). Second, the correlation between the two variables is -0.1071737. It means that there is a negative relation. Third, the linear regression function is y= -0.11246x + 5.43585 and a p-value of 1.05e-07. From the plot, we can see that distribution of the values are dense near the regression line. P-value shows that there is a significant correlation between the two variables. The slope of the function means that the relation is negative, the more nativist the person is, the more he/she is at the right end of the political ideological scale. 
+
+
+
+
+
+2. Relationship between Immigration(j01) and partisanship(e01)
+```{r}
+# For variable Immigration(jo1) replacing the negative values of -1 to NA
+imm <- replace(v<-bes$j01,v==-1,NA)
+```
+
+a. Table of Proportions
+```{r}
+tbl2<-table(partisan1,imm)
+prop.table(tbl2)
+```
+
+b. Correlation
+```{r}
+cor(imm, partisan1, use="complete")
+
+```
+
+c. Regression
+
+Partisanship = a+b(immigration)
+```{r}
+fit1 <- lm(partisan1 ~ imm)
+summary(fit1)
+```
+
+```{r}
+# We can see the line that best fits with the data
+plot(jitter(imm), jitter(partisan1))
+abline(lm(imm ~ partisan1))
+```
+
+
+Now, I will compare the effects of anti-feminism and nativism. It is possible but difficult to compare the effects using proportion table. Let me compare the results of correlation and regression. The absolute value of correlation coefficient is larger in the case of anti-feminism. Likewise, the absolute value of the regression line slope is greater in the case of anti-feminism. This means that the effect of anti-feminism is greater than that of nativism upon party support. Therefore, it is safe to say that the support for anti-immigration populists like Trump or the UKIP party arises from anti-feminism more than nativism.   
+
+
+
+Let me move on to the next statement: "In countries like the UK, education and income are not strongly related."  The correlation would be the most appropriate way to see whether they are strongly related or not. The correlation coefficent is -0.05440483. This means that the higher the level of a person's education, the higher one's income would be. (Referring to the codebook, the values of ??education?? variable are in the order of highest to the lowest). Furthermore, the absolute value of corretlation coefficient seems low, which would support the statement in question. However, the value of coefficient is relative. In order to test whether this is a low correlation or not, we need to compare the value with that of other countries other than the UK to make sure the statement is correct.  
+
+The result of regression gives us the function of y= -0.04098x + 7.57299. From the plot, we can see that distribution of the values are dense near the regression line. The p-value is 0.0101, telling us that there is a significant relationship between the two variables. It means that there is a negative relation between the two variables: the higher the level of a person??s education, the higher one??s income would be. Just like in the case of correlation, we cannot guarantee whether the relation is strong. In order to do so, we should compare the absolute value of the function??s slope with that of other countries.
+
+3. Relationship between Income(y01) and education
+```{r}
+library(dplyr)
+
+# using filter function to remove the negative values (-1 and -2)
+bes1 <- bes %>%filter(!(y01==-1))  
+bes2 <- bes1 %>%filter(!(y01==-2))
+```
+
+
+a. Table of Proportions
+```{r}
+tbl4<-table(bes2$y01,bes2$education)
+prop.table(tbl4)
+```
+
+b. Correlation
+```{r}
+cor(bes2$y01, bes2$education)
+```
+
+c. Regession
+
+Income=a+b(Edcuation)
+```{r}
+regress <- lm(bes2$y01 ~ bes2$education)
+summary(regress)
+```
+
+```{r}
+plot(jitter(bes2$y01), jitter(bes2$education))
+abline(lm(bes2$y01 ~ bes2$education))
+```
+
+
+I presented three ways to describe the relationships; table of proportions, correlation, and regression. Among these, I would suggest that regression is the best way to compare the effects of each variable. Regression gives us more information on the relationship than other two ways. In particular, the relationship can be described in the form of function, which gives us a line through the data. The line represents the general tendency or prediction of the relationship. The line is drawn by minimizing the distance of each observation to the line. It minimizes the prediction errors in the observed value and predicted value. This method is called the least squares method. The reason why it should be ??least?? squares rather than 'most' squares is because we want a line that is closest to the values, which can best represent the values. The reason why it uses ??squares?? is in order to eliminate the possibility of obtaining negative values in the process of calculating the distance.
+
+
+
