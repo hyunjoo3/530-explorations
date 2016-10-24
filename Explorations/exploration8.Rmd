@@ -1,0 +1,160 @@
+# Exploration 8
+
+
+## 1. Difference in Differences
+
+
+The difference-in-differences (henceforth DiD) method is essentially looking at the difference in outcomes between control group A and treatment group B in Time 1, extrapolating a hypothetical non-treated outcome of B in Time 2 that runs parallel to A, and then comparing the outcome of hypothetical B in Time 2 with the outcome of actual B in Time 2. As the name of the method implies, the focus is on the difference, or ???change,??? between the two differences of hypothetical and actual B from A in Time 2; the DiD here serves as an indicator of the treatment effect. If we were to take this method into the study of Medellin, we would first find the difference in homicide rate of the treatment and control villages for 2003 and then estimate the ???normal??? (meaning, hypothetically non-treated) homicide rate for treatment villages in 2008. The ???normal??? homicide rate for treatment villages in 2008 serves as a counterfactual to which we compare the actual 2008 homicide rate of treatment villages. The difference between these two numbers would be the treatment effect. As with ordinary least squares regression, DiD assumes that relationships will be linear and additive. But most importantly, DiD assumes that trends over time will stay parallel (i.e. a ???fixed difference???) between the ???normal??? treatment group and control group.
+
+```{r}
+load(url("http://jakebowers.org/Data/meddat.rda"))
+
+
+a =sapply((subset(meddat, nhTrt==0, select =HomCount2003)),mean)
+b=sapply((subset(meddat, nhTrt==1, select =HomCount2003)),mean)
+c =sapply((subset(meddat, nhTrt==0, select =HomCount2008)),mean)
+d=sapply((subset(meddat, nhTrt==1, select =HomCount2008)),mean)
+```
+### Compute the effect of the MetroCable on the number of Homicides (D-I-D)
+(d-c)-(b-a)
+
+
+###Using least squares
+did = meddat$HomCount2008*meddat$nhTrt #Here you create the interaction between time and treatment
+lm(meddat$HomCount2008~meddat$nhTrt+did)
+ 
+DiD can be a useful approach when faced with imbalance and lack of overlap in terms of covariates, as these kind of issues usually force us to rely more heavily on model specification and less on direct
+support from the data (Gelman & Hill, 2007). In previous weeks, we have examined matching and covariance adjustment as ways to statistically adjust for covariates so that a fair comparison is warranted. Because data from the Medellin study exhibited a large number of covariates that were more or less imbalanced, we tried matching treatment and control villages that were similar in a selection of covariates. We also tried covariance adjustment using a linear model; an expedient method when dealing with a large dataset where the relationship under question is linear. However, this method still left us with the problem of dimensionality and it was difficult to say that our data of 45 villages was large enough for this method. Overall, matching and covariance adjustment can be helpful when trying to solve the issue of imbalance and lack of overlap, but they still very much rely on model specification. 
+
+
+DiD, on the other hand, focuses more on the data itself, specifically ???changes over time??? in the treatment and control groups. Thus, rather than comparing differences in the 2008 homicide rate of treatment and control villages with regards to the 20 or so covariates, the DiD method estimates if the trend (homicide rate) over time would have been the same between the treatment and control villages in absence of the Metrocable intervention. However, the DiD method has its own weakness in that the control and treatment villages may differ in ways that are related to their trends over time, or their compositions may change over time, as mentioned by Stuart et al. (2014). To deal with these types of confounding variables, Stuart et al. recommend using propensity score methods with DiD; propensity score methods can be useful in DiD situations where the composition of each group may change over time (which certainly may be the case with the Medellin study). 
+
+
+In the next section, we estimate the effect of talking with a canvasser on the voter turnout. First, we need to discuss the instrument variable, what it means, why we use it, and some of the assumptions of instrumental variable estimation. We use both the Wald estimate and two-stage least square regression.
+
+
+#2. Instrumental variable 
+
+##Definition of Instrumental variable (Z) and Why not control for or matching?
+ 
+So far, we used regression and matching to find the effect of an independent variable (X) on a dependent variable (Y). They are both used to estimate the effect of a variable (or treatment) on the outcome. However, they are limited in the sense that they cannot account for unobserved covariates. In the case of standard regression based on ordinary least squares, it estimates the effect of X on Y under the assumption that X is uncorrelated with the errors in the model. This means that OLS regression cannot control for potential confounders, and is not free from problems such as omitted variable bias or reverse causality.
+ 
+The purpose of matching is to balance confounding covariates across the treatment and control groups when random assignment is not feasible. By using pairwise, propensity score, or other types of matching we can make the treatment and control group more comparable. However, matching cannot control for unobserved confounding covariates as well.
+ 
+To address this limitation, we can use the instrumental variable (Z). Estimation using instrumental variable controls for unobserved variables that could be driving the differences across treatment and control groups. In other words, instrumental variable accounts for endogeneity of X without having to control the potential confounders. By constructing a variable Z that is correlated with X but does not have a direct effect on Y, it eliminates potential systematic association between predictors and errors. Thus, the changes in Z are only associated with X, but only affects Y indirectly via X.
+ 
+##The Assumptions for Instrumental Variables Estimation
+Four assumptions must be met to conduct instrumental variables estimation. First is the random assignment of Z, meaning that the instrument is independent (as good as randomly assigned) and that does not directly affect Y. Second is the exclusion restriction (exogeneity of Z), meaning that the instrumental variable Z should influence Y only through X. Third is monotonicity, meaning that a subject???s treatment assignment does not matter once we account for whether a subject is actually treated. Fourth, there should be nonzero effect of Z on X, meaning that Z should be correlated with X. If the association between the two is too weak, the instrumental variable would not be a valid one.
+ 
+##The Methods
+One widely used method in instrumental variable estimation is the two- stage least squares (2SLS) estimator. In the first stage, X is regressed on Z. The coefficients of the first stage regression generate the predicted value of X. In other words, the proxy variable of X is generated, and in the second stage, the predicted value is the substitute for X. In the second stage, Y is regressed on the predicted value.
+
+
+In the exploration, X is a binary variable that equals 1 if the subject talked with the canvasser and Z is the intent-to-treat which equals 1 if the person was in the group that we intended to treat. The intent-to-treat is a measure of the average effect of experimental assignment on outcomes, regardless of the proportion of the treatment group that is actually treated. In this case, intent-to-treat serves as an instrument for the actual contact. Constructing an instrumental variable is useful because we cannot assume that all the people who were knocked on the door will answer and talk with the canvasser. If we assume that every people that is knocked will answer, this makes the random assignment procedure become meaningless and the results may be biased. This is because people who answer the door could be systematically different from those who do not answer the door.
+
+## Codes
+```{r}
+library(foreign)
+library(dplyr)
+nhIndiv<-read.dta("http://jakebowers.org/Data/NHrep_individual.dta")
+vote98dat<-filter(nhIndiv,persons==1)
+```
+In a regression analysis of the canvassing effects, the regression equation can be written as follows (Gerber and Green 2000).
+
+
+Y = a + b1X1 + b2X2 + e
+
+
+where Y denotes whether the subject votes, X1 is whether the subject is difficult to contact, X2 is about if the subject is actually contacted, and e is the error term. We assume that some of the subjects are more difficult to reach than others, so we put X1 into the equation. However, X1 cannot be observed so we need to ignore X1 and run the regression. In this case, the regression may yield results of the correlation between the contact from canvasser (X2) and the actual voting behavior (Y), only if X1 and X2 are unrelated. However, we can assume that there exists some correlation between those who are easy to contact and the actual contact from canvasser. Therefore, we need to solve this correlation problem by adopting a suitable instrumental variable. 
+
+
+The instrumental variable (IV) must be uncorrelated with the dependent variable and the regression error. In this experiment research, the IV is chosen from the variable persngrp, which indicates that the subject is assigned to personal visit group. Because the subjects are randomly assigned, it is safe to say that those who can be contacted easily are overrepresented. We can describe the regression equation as follows: 
+
+
+Y = a + b1X1 + b2X2 + e
+
+X2= c + d1Z + v
+
+
+where Z denotes the IV of persngrp, v denotes the error term. The first step is to regress the "treatment" variable, cntany (personal visits contact), on the IV of persngrp. 
+
+
+```{r}
+# v98 (Y) : 1998 vote missing values coded as zero
+# persngrp (Z) : assigned to personal visit group
+# cntany (X2) : personal visits contact (all members of a household coded as contacted)
+
+
+# Wald estimate 
+fit.1a <- lm (cntany ~ persngrp, data=vote98dat) # the coefficient of the treatment (persngrp)
+```
+
+
+The coefficient of the treatment is 0.265 which shows the proportion of induced contacts. 
+Next, we calculate the intent-to-treat estimate, the effect of assigning to treatment on the voting behavior. 
+
+```{r}
+fit.1b <- lm (v98~persngrp, data=vote98dat) # the intent-to-treat estimate = 0.029
+```
+The intent-to-treat estimate is 0.029, then we divide this by the regression result of the coefficient of the treatment. 
+
+
+```{r}
+iv.est <- coef(fit.1b)["persngrp"]/coef(fit.1a)["persngrp"] # the estimated effect of personal contact = Wald estimate = 0.1076
+```
+
+
+The estimated effect of assignment is 0.1076, which states that the estimated effect of contacting shows 10.76% change in vote participation. 
+
+We can also arrive at the regression result by applying two-stage least squares. The first step is to regress the actual contact on the assignment to the treatment. At this first stage, from the observed data, we can estimate the d1, the coefficient of the treatment, and calculate the fitted values, cntany.hat. 
+
+
+```{r}
+#2SLS
+fit.2a <- lm (cntany ~ persngrp, data=vote98dat)
+cntany.hat <- fit.2a$fitted
+summary(cntany.hat)
+help("fitted") # extracting fitted values from objects returned by modeling functions 
+```
+
+
+Then, we put the estimates into the equation predicting the effects of contacting on voting behavior. 
+
+
+```{r}
+fit.2b <- lm (v98 ~ cntany.hat, data=vote98dat)
+summary(fit.2b) # Coefficient = 0.1076 , the effect of talking with a canvasser = 0.1076
+coef(fit.2b) # canvassing increased turnout rates among Compliers by 10.8 percentage points 
+confint(fit.2b) # The confidence intervals show that the range of change spans from 3.6% to 18%. 
+```
+
+
+The result is identical to the one from the Wald estimate. Canvassing increased turnout rates among the contacted by 10.8 percent points. The confidence intervals show that the results fall within a certain range from 3.6% to 18%, which we can interpret that the estimated effects of change can be low as 3.6% and high as 18% points. 
+
+
+
+
+# References 
+Stuart, E. A., Huskamp, H. A., Duckworth, K., Simmons, J., Song, Z., Chernew, M., & Barry, C. L. (2014). Using propensity scores in difference-in-differences models to estimate the effects of a policy change. Health Services & Outcomes Research Methodology, 14(4), 166???182. http://doi.org/10.1007/s10742-014-0123-z
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4267761/#R25
+
+
+Gerber, Alan S., and Donald P Green. 2000. ???The Effects of Canvassing, Telephone Calls, and Direct Mail on Voter Turnout: A Field Experiment.??? American Political Science Reivew, 94(3), 653-663
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
