@@ -1,0 +1,401 @@
+---
+title: |Sarah, Hyun Joo, Hye Soo, James
+ | Exploration 9: Engaging with Alternative Explanations with Other Design Strategies: 
+ | The Regression Discontinuity Design
+
+###Regression Discontinuity Design
+
+####1. What is RDD?
+
+Regression discontinuity design examines the effect of some treatment on a population by comparing two groups of subjects. As usual, these are a control and treatment group. However, unlike other experiments where treatment is assigned by randomization, assignment is assigned via some “cutoff point” in some other variable. All subjects below the cutoff may be assigned treatment, while all above may be assigned to control. For example, suppose we want to examine the effects of a new cancer treatment on patients: we may assign treatment to all those whose general wellness score fall below 50 (on a scale of 1-100), and control to all those whose general wellness lies above 50. After administering treatment, the regression lines of the two groups are compared: the regression line of the control group before time of treatment, and the regression line of the treatment group after time of treatment. There should be some jump or “discontinuity” between these two regression lines, representing the effect of the treatment. 
+
+####2. Assumptions behind RD
+
+There are four assumptions behind RD. The first assumption is that random assignment is not possible but there is an observable variable (often called “running” or “assignment” variable) that determines treatment based on a cutoff value. The second assumption is that there is a discontinuity in the level of treatment at some cutoff point of the running variable. The third crucial assumption is that individuals cannot precisely manipulate the running variable to affect whether or not they receive the treatment. For instance, manipulation is possible when an individual pretends to be sick and lower his/her wellness score, assigning him/herself to be below or above the threshold. Lastly, the only reason the outcome variable jumps at the cutoff is due to the discontinuity in the level of treatment. In other words, besides the discontinuity, there is no other ways that observations on one side of the cutoff are treated differently from those on the other side.
+
+####3. Why don’t we have to control for covariates?
+
+The RD estimator assumes “as-if random” assignment of the level of treatment, so that individuals on either side of the cut-off should be very similar to each other in their observable and unobservable characteristic. If the treatment assignment is “as good as random,” there are no systematic differences between treatment and control groups, so one does not need to control for baseline covariates. Thus, if the RD design is valid, including covariates should not affect RD estimate.
+
+####4. Types of RD and how do instrumental variables play a role?
+
+There are two types of RD. First, in sharp design, the probability of receiving the treatment is 1 below a given threshold and 0 above (or vice versa). For example, individuals left to the cutoff always get treated, while individuals right to the cutoff never get treated. As mentioned above, the underlying principle of this is that observations just below and above the threshold are very similar to each other with respect to observed and unobserved characteristics, except for the outcome. Thus, the mean difference in the outcomes can be seen as the treatment effect.  
+
+Second, in fuzzy design, the probability that someone is treated changes discontinuously at the cutoff by less than one. That is, being below or above the cutoff does not determine whether an individual gets treated or not. In this case, we cannot compare the mean difference in the outcome between the control and treatment groups. This problem is similar to the non-compliance problem in a randomized experiment. There may be non-compliers in the treatment group, which makes the random assignment procedure meaningless. In this case, we can use use two stage least square estimation with an instrument to find the effect of treatment on the outcome. The discontinuity (treatment assignment) is used as an instrumental variable (IV) for treatment status. For instance, the instrument can be a dummy coded as 1  for being above the threshold. The instrument is correlated with treatment receipt and it is not correlated with errors in the outcome model. The assumptions of monotonicity (i.e., rules out the existence of defiers) and excludability (i.e., crossing the cutoff can impact the outcome only through affecting receipt of treatment) should be met as well. 
+
+###Brollo et.al.’s “Political Resource Curse” 
+
+####1. Setup of the study (research question)
+
+The Brollo et. al. study looks at the effect of additional government revenues on political corruption. Specifically, it asks how an increase in government transfers to a municipality will affect levels of political corruption in that area. It uses data from Brazil to test their hypotheses, as Brazil has a unique method of issuing government transfers to municipalities, wherein municipalities with smaller populations receive less money, and larger municipalities receive more money as they pass designated population thresholds. There are 8 such thresholds, making 9 different population brackets and 9 different government funding levels that municipalities can fall into. Such a setup provides a natural setting for executing a regression discontinuity design. The authors predict that as government transfers increase in a municipality, the occurrence of political corruption in that area will increase. 
+
+####2. Model and empirical analysis
+
+The population thresholds set by the Brazilian government provide perfectly for a regression discontinuity design of regression with multiple cutoffs. The author note that while set cutoffs do exist, municipalitie still have some chance of falling within a different bracket in actuality. This can be due to a number of circumstances, such as a city being recategorized into a different bracket too late for it to affect actual transfers. Because of this, a fuzzy RDD should be employed. The authors use an average of the most recent available 3 years of government transfer data for current transfers, as well as using it as a proxy for future transfers. Because future transfers cannot be observed, the authors are forced to use theoretical transfers for the RDD. 
+
+Analysis looks at the first 7 population brackets designated by the Brazilian government, or all municipalities with a population under 50,940. In the case of the model we are concerned with, on the effect of government transfers on political corruption, the dependent variable is corruption, designated at broad or narrow. (Broad can be interpreted as bad administration rather than corruption, while narrow is clearly visible and understandable to the public.) The independent variable is government transfers to the municipality in question, determined by the government-assigned transfer amounts for each population bracket. 
+
+However, because the actual amount of money received by a municipality may be affected by things other than strict assignment to a population bracket, an instrumental variable should be used in this case. Here, the instrumental variable is theoretical transfer values, or assignment to treatment. 
+
+####3. RDD in the Brollo study
+
+RDD is an easy choice in this study, considering the cutoff points already assigned by the Brazilian government in their transfers program. The population cutoffs, resulting in increasing government transfers as population increases, provide multiple cutoffs to be used in RDD. The fact that some municipalities may not receive their designated transfer amount in actuality determines the use of fuzzy RDD over sharp. Following this setup, Brollo is examining the change in the transfers-to-corruption regression line between municipalities below a cutoff (receiving less money) and those above a cutoff (receiving more money). This design is executed 7 times at different cutoff points, with the results being normalized and pools for final results. 
+
+####4. Results of the study
+
+The study found that a 10% increase in government transfers led to a 6% increase in broad corruption and a 16% increase in narrow corruption in the concerned municipality. These results reference the overall effect of transfers, being the normalized and pooled effects of transfers over the 7 thresholds examined. In each separate threshold, the effect of an increase in government transfers has a positive (and often significant) impact on levels of broad and narrow corruption.
+
+###Cattaneo et.al.’s interpretations of the Brollo study
+
+####1. General criticism of RDD with multiple cutoffs
+
+Cattaneo and his colleagues are addressing the question of RDD with multiple cutoffs. The strict definition of RDD states that there is some (single) cutoff at which treatment begins to be assigned. The entire subject pool can be divided into two groups of treatment and control. In a multiple cutoff design, there are multiple points at which treatment may differ. In the Brollo case, these multiple cutoff points are the population brackets for municipalities, with the treatment of government transfers increasing at each cutoff. Cattaneo addresses the possibility that empirical analysis in the presence of multiple cutoffs may result in inaccurate or incomplete results via the use of “normalized-and-pooled” results. This means that while regressions are run for each of the 7 cutoff points in question, the results of these regressions are pooled into a single interpretable result. This simplifies the analysis and conclusion process, but can ignore important heterogeneity in the results, as Cattaneo describes. By pooling the results of analysis at these 7 separate cutoff points, the research is assuming that the regression functions and density is maintained, which may not be true. Different population brackets may respond differently to the same type of treatment. Additionally, pooling the results gives higher weights to more common cutoff points, and to those brackets with a larger sample size. By pooling results, any differences in the effects of treatment in each bracket are smoothed out and essentially ignored. It is easy to miss some important observable difference in treatment effects.
+
+####2. How to address the problem of normalized-and-pooled results
+
+It is recommended first that some simple diagnostics are performed on the data, to see if subjects are concentrated around a single cutoff point or many. This can help determine whether a single sharp RD is possible, or if there exists enough heterogeneity to justify multiple cutoffs. In the case of the Brollo study, municipalities are significantly diverse in their population sizes, justifying the use of multiple cutoffs. Once that has been decided, the distinction between individual and pooled results needs to be made. They should be compared, in order to determine whether or not pooled results are masking significant heterogeneity in results across cutoff points. In reanalyzing the data used in the Brollo study, Cattaneo observe that the individual cutoff points’ regression coefficients are all positive and similar to the coefficient for pooled effects, save the last cutoff (with a smaller sample size, that displays a much larger coefficient than the others). This suggests that using pooled effects in this study can be justified.
+
+####3. Window/bandwidth selection in RDD
+
+As discussed above, the design of RD generally eliminates the need to control for covariates. This is because treatment around the cutoff value(s) is as good as random, in the sense that subjects around that cutoff are very similar in observable and unobservable characteristics. The “window” in RDD refers to the frame around the cutoff point within which we can assume randomization, or balance on covariates. Choosing the window size of RDD involves a tradeoff between balance on covariates (assuring randomization, or “as good as randomization) and sample size. Typically, balance on covariates will increase as the window is shrunk: in this case, municipalities that are closer to the precise population cutoff in question will be more similar. However, shrinking the window size also means having a smaller sample size, meaning that the results of the regression will be more local and harder to apply to other external situations. 
+
+
+> datasetup.R
+
+```{r, cache=TRUE}
+library(readstata13)
+dat <- read.dta13("http://jakebowers.org/Data/CattaneoEtAl2016/data-population-example.dta", convert.factors=FALSE)
+attr(dat,"var.labels")
+
+```
+
+```{r, cache=TRUE}
+brollodat <- read.dta13("http://jakebowers.org/Data/CattaneoEtAl2016/AER_smallsample.dta",convert.factors=FALSE)
+stopifnot(all.equal(dat$x,brollodat$pop))
+length(unique(dat$x))
+length(unique(brollodat$pop))
+## Restrict attention to only municipalities with unique population numbers so that we can use the covariates from the Brollo et al paper.
+
+uniqdat <- dat[!duplicated(dat$x),]
+uniqbrollodat <- brollodat[!duplicated(brollodat$pop),]
+stopifnot(all.equal(uniqdat$x,uniqbrollodat$pop))
+
+## Merge the covariates from the Brollo et al paper onto the original dataset
+bigdat <- merge(uniqdat,uniqbrollodat,by.x="x",by.y="pop",all=TRUE)
+library(dplyr)
+## dplyr functions are often faster than base R functions
+uniqdat$pop <- uniqdat$x ## to allow both data frames to have same key name
+stopifnot(intersect(names(uniqdat),names(uniqbrollodat))=="pop")
+bigdat <- inner_join(uniqdat,uniqbrollodat,by="pop")
+stopifnot(nrow(bigdat)==nrow(uniqdat))
+stopifnot(nrow(bigdat)==nrow(uniqbrollodat))
+stopifnot(all.equal(bigdat$pop,bigdat$x))
+save(bigdat,file="bigdat.rda")
+```
+
+
+> analysis.Rmd
+
+> Here are some of my notes:  Step 1: Assess window size. Maybe DCdensity in
+> package rdd givn sec 2.3 in Sales and Hansen?? Or xBalance? Is our running
+> variable discrete? Yes in fact. No in principle. Right? I don't know if
+> disbursements were chunky or continuous at the federal level. Or maybe better
+> specification test style approach of Sales and Hansen ion sec 3.2 sec 4?? So
+> confusing!
+
+```{r}
+rm(list=ls()) ## removes all existing objects in the working memory
+load("bigdat.rda")
+## Treatment indicator for first discontinuiity of 10189
+## Other discontinuities: 13585, 16981, 23773, 30565, 37356, 44148
+bigdat$z10189 <- as.numeric(bigdat$x>=10189)
+mean(bigdat$y[bigdat$z10189==1 & bigdat$cutoff_10189==1]) - mean(bigdat$y[bigdat$z10189==0 & bigdat$cutoff_10189==1])
+lm(y~z10189,data=bigdat,subset=cutoff_10189==1)
+
+
+```
+
+
+```{r}
+rm(list=ls()) ## removes all existing objects in the working memory
+load("bigdat.rda")
+## Treatment indicator for first discontinuity of 10189
+## Other discontinuities: 13585, 16981, 23773, 30565, 37356, 44148
+bigdat$z10189 <- as.numeric(bigdat$x>=10189)
+mean(bigdat$y[bigdat$z10189==1 & bigdat$cutoff_10189==1]) - mean(bigdat$y[bigdat$z10189==0 & bigdat$cutoff_10189==1])
+lm(y~z10189,data=bigdat,subset=cutoff_10189==1)
+
+bigdat$z13585 <- as.numeric(bigdat$x>=13585)
+mean(bigdat$y[bigdat$z13585==1 & bigdat$cutoff_13585==1]) - mean(bigdat$y[bigdat$z13585==0 & bigdat$cutoff_13585==1])
+lm(y~z13585, data=bigdat,subset=cutoff_13585==1)
+
+bigdat$z16981 <- as.numeric(bigdat$x>=16981)
+mean(bigdat$y[bigdat$z16981==1 & bigdat$cutoff_16981==1]) - mean(bigdat$y[bigdat$z16981==0 & bigdat$cutoff_16981==1])
+lm(y~z16981,data=bigdat,subset=cutoff_16981==1)
+
+bigdat$z23773 <- as.numeric(bigdat$x>=23773)
+mean(bigdat$y[bigdat$z23773==1 & bigdat$cutoff_23773==1]) - mean(bigdat$y[bigdat$z23773==0 & bigdat$cutoff_23773==1])
+lm(y~z23773,data=bigdat,subset=cutoff_23773==1)
+
+bigdat$z30565 <- as.numeric(bigdat$x>=30565)
+mean(bigdat$y[bigdat$z30565==1 & bigdat$cutoff_30565==1]) - mean(bigdat$y[bigdat$z30565==0 & bigdat$cutoff_30565==1])
+lm(y~z30565,data=bigdat,subset=cutoff_30565==1)
+
+bigdat$z37356 <- as.numeric(bigdat$x>=37356)
+mean(bigdat$y[bigdat$z37356==1 & bigdat$cutoff_37356==1]) - mean(bigdat$y[bigdat$z37356==0 & bigdat$cutoff_37356==1])
+lm(y~z37356,data=bigdat,subset=cutoff_37356==1)
+
+bigdat$z44148 <- as.numeric(bigdat$x>=44148)
+mean(bigdat$y[bigdat$z44148==1 & bigdat$cutoff_44148==1]) - mean(bigdat$y[bigdat$z44148==0 & bigdat$cutoff_44148==1])
+lm(y~z44148,data=bigdat,subset=cutoff_44148==1)
+```
+
+
+```{r}
+#Making a formula including covariates for cutoff 10189
+colnames(bigdat)
+fm_z10189 <- reformulate(c(names(bigdat)[c(22, 23, 24)], "y"),response="z10189")
+fm_z10189
+
+#Checking for balance between villages that have 100 citizens more or less than the 10189 cutoff.
+library(RItools)
+window <- 100
+cutoff <- 10189
+xBalance(fm_z10189,data=subset(bigdat, pop>cutoff - window,pop<cutoff+window),report=c("std.diffs","z.scores","adj.means","adj.mean.diffs", "chisquare.test","p.values"))
+````
+
+```{r}
+#Checking for balance between villages that have 200 citizens more or less than the 10189 cutoff.
+window <- 200
+cutoff <- 10189
+xBalance(fm_z10189,data=subset(bigdat, pop>cutoff - window, pop<cutoff+window), report=c("std.diffs","z.scores","adj.means","adj.mean.diffs", "chisquare.test","p.values"))
+
+#Checking for balance between villages that have 300 citizens more or less than the 10189 cutoff.
+window <- 300
+cutoff <- 10189
+xBalance(fm_z10189,data=subset(bigdat, pop>cutoff - window, pop<cutoff+window), report=c("std.diffs","z.scores","adj.means","adj.mean.diffs", "chisquare.test","p.values"))
+
+#Checking for balance between villages that have 400 citizens more or less than the 10189 cutoff.
+window <- 400
+cutoff <- 10189
+xBalance(fm_z10189,data=subset(bigdat, pop>cutoff - window, pop<cutoff+window), report=c("std.diffs","z.scores","adj.means","adj.mean.diffs", "chisquare.test","p.values"))
+
+```
+
+```{r}
+#We see the best balance at a cutoff of 300 above and below the cutoff line
+
+#Running a regression for cutoff 10189 based on chosen window (+/- 300)
+
+z10189_new <- bigdat$pop[subset=bigdat$pop>9889&bigdat$pop<10489]
+y_10189_new <- bigdat$y[subset=bigdat$pop>9889&bigdat$pop<10489]
+z10189_new
+y_10189_new
+lm(y_10189_new~z10189_new,data=bigdat,subset=cutoff_10189==1)
+
+#Making a formula including covariates for cutoff 13585
+fm_z13585 <- reformulate(c(names(bigdat)[c(22, 23, 24)], "y"),response="z13585")
+fm_z13585
+
+#Checking for balance between villages that have 100 citizens more or less than the 13585 cutoff.
+window <- 100
+cutoff <- 13585
+xBalance(fm_z13585,data=subset(bigdat, pop>cutoff - window, pop<cutoff+window), report=c("std.diffs","z.scores","adj.means","adj.mean.diffs", "chisquare.test","p.values"))
+
+
+#Checking for balance between villages that have 200 citizens more or less than the 13585 cutoff.
+window <- 200
+cutoff <- 13585
+xBalance(fm_z13585,data=subset(bigdat, pop>cutoff - window, pop<cutoff+window), report=c("std.diffs","z.scores","adj.means","adj.mean.diffs", "chisquare.test","p.values"))
+
+#Checking for balance between villages that have 300 citizens more or less than the 13585 cutoff.
+window <- 300
+cutoff <- 13585
+xBalance(fm_z13585,data=subset(bigdat, pop>cutoff - window, pop<cutoff+window), report=c("std.diffs","z.scores","adj.means","adj.mean.diffs", "chisquare.test","p.values"))
+
+
+#Checking for balance between villages that have 400 citizens more or less than the 13585 cutoff.
+window <- 400
+cutoff <- 13585
+xBalance(fm_z13585,data=subset(bigdat, pop>cutoff - window, pop<cutoff+window), report=c("std.diffs","z.scores","adj.means","adj.mean.diffs", "chisquare.test","p.values"))
+
+#We see the best balance at a cutoff of 300 above and below the cutoff line
+
+#Running a regression for cutoff 13585 based on chosen window (+/- 300)
+
+z13585_new <- bigdat$pop[subset=bigdat$pop>13285&bigdat$pop<13885]
+y_13585_new <- bigdat$y[subset=bigdat$pop>13285&bigdat$pop<13885]
+z13585_new
+y_13585_new
+lm(y_13585_new~z13585_new,data=bigdat,subset=cutoff_13585==1)
+
+#Making a formula including covariates for cutoff 16981
+fm_z16981 <- reformulate(c(names(bigdat)[c(22, 23, 24)], "y"),response="z16981")
+fm_z16981
+
+#Checking for balance between villages that have 100 citizens more or less than the 16981 cutoff.
+window <- 100
+cutoff <- 16981
+xBalance(fm_z16981,data=subset(bigdat, pop>cutoff - window, pop<cutoff+window), report=c("std.diffs","z.scores","adj.means","adj.mean.diffs", "chisquare.test","p.values"))
+
+#Checking for balance between villages that have 200 citizens more or less than the 16981 cutoff.
+window <- 200
+cutoff <- 16981
+xBalance(fm_z16981,data=subset(bigdat, pop>cutoff - window, pop<cutoff+window),report=c("std.diffs","z.scores","adj.means","adj.mean.diffs", "chisquare.test","p.values"))
+
+#Checking for balance between villages that have 300 citizens more or less than the 16981 cutoff.
+window <- 300
+cutoff <- 16981
+xBalance(fm_z16981,data=subset(bigdat, pop>cutoff - window, pop<cutoff+window), report=c("std.diffs","z.scores","adj.means","adj.mean.diffs", "chisquare.test","p.values"))
+```
+
+####Checking for balance between villages that have 400 citizens more or less than the 16981 cutoff.
+
+
+```{r}
+window <- 400
+cutoff <- 16981
+xBalance(fm_z16981,data=subset(bigdat, pop>cutoff - window, pop<cutoff+window),report=c("std.diffs","z.scores","adj.means","adj.mean.diffs", "chisquare.test","p.values"))
+
+#Checking for balance between villages that have 500 citizens more or less than the 16981 cutoff.
+window <- 500
+cutoff <- 16981
+xBalance(fm_z16981,data=subset(bigdat, pop>cutoff - window, pop<cutoff+window), report=c("std.diffs","z.scores","adj.means","adj.mean.diffs", "chisquare.test","p.values"))
+```
+
+```{r}
+#Running a regression for cutoff 16981 based on chosen window (+/- 300)
+
+z16981_new <- bigdat$pop[subset=bigdat$pop>16681&bigdat$pop<17281]
+y_16981_new <- bigdat$y[subset=bigdat$pop>16681&bigdat$pop<17281]
+z16981_new
+y_16981_new
+lm(y_16981_new~z16981_new,data=bigdat,subset=cutoff_16981==1)
+
+#Based on the results of the balance checks for the previous cutoffs, we will proceed with a window size of +/- 300 for the remaining cutoffs
+
+#Running a regression for cutoff 23773 based on chosen window (+/- 300)
+
+z23773_new <- bigdat$pop[subset=bigdat$pop>23473&bigdat$pop<24073]
+y_23773_new <- bigdat$y[subset=bigdat$pop>23473&bigdat$pop<24073]
+z23773_new
+y_23773_new
+
+#Running a regression for cutoff 30565 based on chosen window (+/- 300)
+
+z30565_new <- bigdat$pop[subset=bigdat$pop>30265&bigdat$pop<30865]
+y_30565_new <- bigdat$y[subset=bigdat$pop>30265&bigdat$pop<30865]
+z30565_new
+y_30565_new
+
+
+#We can’t get results because we have too small of a sample size…. Let’s increase the sample size by increasing the window to +/- 2000
+
+z30565_new <- bigdat$pop[subset=bigdat$pop>28565&bigdat$pop<32565]
+y_30565_new <- bigdat$y[subset=bigdat$pop>28565&bigdat$pop<32565]
+z30565_new
+y_30565_new
+
+
+#Running a regression for cutoff 37356 based on chosen window (+/- 300)
+
+z37356_new <- bigdat$pop[subset=bigdat$pop>37056&bigdat$pop<37656]
+y_37356_new <- bigdat$y[subset=bigdat$pop>37056&bigdat$pop<37656]
+z37356_new
+y_37356_new
+
+
+#We can’t get results because we have too small of a sample size…. Let’s increase the sample size by increasing the window to +/- 3000
+
+z37356_new <- bigdat$pop[subset=bigdat$pop>34356&bigdat$pop<40356]
+y_37356_new <- bigdat$y[subset=bigdat$pop>34356&bigdat$pop<40356]
+z37356_new
+y_37356_new
+
+
+#Running a regression for cutoff 44148 based on chosen window (+/- 300)
+
+z44148_new <- bigdat$pop[subset=bigdat$pop>43848&bigdat$pop<44448]
+y_44148_new <- bigdat$y[subset=bigdat$pop>43848&bigdat$pop<44448]
+z44148_new
+y_44148_new
+
+
+#We can’t get results because we have too small of a sample size…. Let’s increase the sample size by increasing the window to +/- 3000
+
+z44148_new <- bigdat$pop[subset=bigdat$pop>41148&bigdat$pop<47148]
+y_44148_new <- bigdat$y[subset=bigdat$pop>41148&bigdat$pop<47148]
+z44148_new
+y_44148_new
+lm(y_44148_new~z44148_new,data=bigdat,subset=cutoff_44148==1)
+
+#Running regressions without changing the window size (sample now includes all municipalities with population between 0 and 50,000)
+
+bigdat$z10189 <- as.numeric(bigdat$x>=10189)
+mean(bigdat$y[bigdat$z10189==1 & bigdat$cutoff_10189==1]) - mean(bigdat$y[bigdat$z10189==0 & bigdat$cutoff_10189==1])
+lm(y~z10189,data=bigdat,subset=cutoff_10189==1)
+
+bigdat$z13585 <- as.numeric(bigdat$x>=13585)
+mean(bigdat$y[bigdat$z13585==1 & bigdat$cutoff_13585==1]) - mean(bigdat$y[bigdat$z13585==0 & bigdat$cutoff_13585==1])
+lm(y~z13585, data=bigdat,subset=cutoff_13585==1)
+
+bigdat$z16981 <- as.numeric(bigdat$x>=16981)
+mean(bigdat$y[bigdat$z16981==1 & bigdat$cutoff_16981==1]) - mean(bigdat$y[bigdat$z16981==0 & bigdat$cutoff_16981==1])
+lm(y~z16981,data=bigdat,subset=cutoff_16981==1)
+
+bigdat$z23773 <- as.numeric(bigdat$x>=23773)
+mean(bigdat$y[bigdat$z23773==1 & bigdat$cutoff_23773==1]) - mean(bigdat$y[bigdat$z23773==0 & bigdat$cutoff_23773==1])
+lm(y~z23773,data=bigdat,subset=cutoff_23773==1)
+
+bigdat$z30565 <- as.numeric(bigdat$x>=30565)
+mean(bigdat$y[bigdat$z30565==1 & bigdat$cutoff_30565==1]) - mean(bigdat$y[bigdat$z30565==0 & bigdat$cutoff_30565==1])
+lm(y~z30565,data=bigdat,subset=cutoff_30565==1)
+
+bigdat$z37356 <- as.numeric(bigdat$x>=37356)
+mean(bigdat$y[bigdat$z37356==1 & bigdat$cutoff_37356==1]) - mean(bigdat$y[bigdat$z37356==0 & bigdat$cutoff_37356==1])
+lm(y~z37356,data=bigdat,subset=cutoff_37356==1)
+
+bigdat$z44148 <- as.numeric(bigdat$x>=44148)
+mean(bigdat$y[bigdat$z44148==1 & bigdat$cutoff_44148==1]) - mean(bigdat$y[bigdat$z44148==0 & bigdat$cutoff_44148==1])
+lm(y~z44148,data=bigdat,subset=cutoff_44148==1)
+
+```
+
+
+
+###Conclusion
+
+Cutoff        |    Window    |     Coef        |    Coef w/o window change
+------------------|--------------------------|--------------------------|--------------------------------------------
+10189        |     +/- 300    |     0.0015    |    0.1318
+13585        |    +/- 300    |    0.00006213    |    -0.06134
+16981        |    +/- 300    |     -0.0004756     |    0.1059
+23773        |    +/- 300    |    -0.002258    |    -0.05919
+30565        |    +/- 2000    |    -0.0001065    |    -0.05579
+37356        |    +/- 3000    |    0.001077    |    -0.03896
+44148        |    +/- 3000    |    0.0004182    |    0.1289
+
+In our reanalysis of Brollo’s study, we used xBalance to check covariate balance using different window sizes around each cutoff point. After running these balance checks for the first 3 cutoff points, we decided to apply to the same window to every cutoff point (a fact that turned out to our disadvantage). We then ran regressions for each cutoff point using the windows chosen. The chart above reports our results.
+
+When running the regression for the 3 largest cutoff points using our chosen window of +/- 300, however, we found that there were not enough observations to run a regression. This is where we found our application of the same window size to each cutoff point was a bad choice. We were forced to increase our window size dramatically simply in order to run a regression.
+
+As you can see in the chart, we have compared the coefficients from our regressions based on new, smaller windows with the coefficients that take all observations into account (i.e. window = population from 0 to 50,000). You can see here that our new coefficients are significantly smaller than the ones using no adjusted window. This reflects the tradeoff between covariate balance and external validity - while we have much better covariate balance (and therefore results less contaminated by outside factors), we have a much smaller sample size and therefore a much lower external validity. The smaller coefficients with the smaller window sizes may be more accurate in terms of having less interference from confounders, while the larger coefficients reflect a larger sample size and thus greater external validity. When executing such types of RDD, it is important to test a variety of window sizes and make your choice. In our case, we probably should have tested a much larger number of windows for covariate balance.
+
+###References
+
+Angrist, Joshua D. and Jorn-Steffen Pischke. Mostly Harmless Econometrics: An Empiricist’s Companion. Princeton University Press, 2009.
+
+Brollo, Fernanda, Tommaso Nannicini, Roberto Perotti, and Guido Tabellini. “The Politics Resource Curse.” American Economic Review 103.5 (2013): 1759-1796.
+
+Cattaneo, Matias D., Luke Keele, Rocio Titiunik, and Gonzalo Vazquez-Bare. “Interpreting Regression Discontinuity Designs with Multiple Cutoffs.” The Journal of Politics 78.4 (2016): 1229-1248.
+
+Trochim, William M.K. “The Regression-Discontinuity Design.” Research Methods Knowledge Base. Published 2006. Accessed 26 October, 2016. <http://www.socialresearchmethods.net/kb/index.php#about>
+
+Sales, Adam and Ben B. Hansen. “Limitless Regression Discontinuity.” Department of Statistics, University of Michigan (2016). 
+
+Sekhon, Jasjeet S. and Rocio Titiunik. “On Interpreting the Regression Discontinuity Design as a Local Experiment.” Regression Discontinuity Designs: Theory and Applications (Advances in Econometrics) 38 (2016).
+
+Skovron, Christopher and Rocio Titiunik. “A Practical Guide to Regression Discontinuity Designs in Political Science.” Working paper, University of Michigan (2015).
+
+
+
